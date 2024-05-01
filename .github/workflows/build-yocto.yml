@@ -51,9 +51,6 @@ jobs:
           bitbake-layers add-layer ../meta-openembedded/meta-networking
           bitbake-layers add-layer ../meta-raspberrypi
 
-      - name: Build Raspberry Pi Image
-        run: |
-          source yocto/oe-init-build-env
           sed -i 's/MACHINE ??= "qemux86-64"/MACHINE ?= "raspberrypi4-64"/' conf/local.conf
 
           bitbake core-image-base --runonly=fetch
