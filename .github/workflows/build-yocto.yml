@@ -34,7 +34,9 @@ jobs:
         run: source yocto/oe-init-build-env
 
       - name: Build Raspberry Pi Image
-        run: bitbake rpi-basic-image
+        run: |
+          cd yocto/build/
+          bitbake rpi-basic-image
 
       - name: Archive Artifact
         uses: actions/upload-artifact@v2
