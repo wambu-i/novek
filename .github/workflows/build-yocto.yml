@@ -3,19 +3,16 @@ name: Build Yocto
 on:
   workflow_dispatch:
     inputs:
+      # The name of the branch of the Yocto source repository which corresponds to a Yocto release: https://wiki.yoctoproject.org/wiki/Releases
+      # The raspberry-pi source should also have a release with the same name.
       yoctoBranch: 
         description: 'Yocto Branch To Use For Build'
         default: 'dunfell'
         required: true
         type: string
-      runName:
-        description: 'Unique Name for Release Image'
-        default: ''
-        required: true
-        type: string
 
 env:
-  YOCTO_SOURCE: ''
+  YOCTO_SOURCE: 'git://git.yoctoproject.org/poky'
   RPI_SOURCE: 'git://git.yoctoproject.org/meta-raspberrypi.git'
   OE_SOURCE: 'git://git.openembedded.org/meta-openembedded'
 
@@ -25,6 +22,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set Date Time
+        id: date_time
+        run: echo "::set-output name=run_date::$(date +'%Y%m%d')"
+
       - name: Checkout Repository
         uses: actions/checkout@v2
 
@@ -34,14 +35,17 @@ jobs:
           sudo apt-get install -y gawk wget git-core diffstat unzip texinfo gcc-multilib build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping libsdl1.2-dev xterm
           sudo locale-gen en_US.UTF-8
 
-      - name: Clone Yocto Repository
-        run: git clone -b ${{ inputs.yoctoBranch }} --single-branch git://git.yoctoproject.org/poky yocto
+      - name: Clone Resources
+        run: |
+          git clone -b ${{ inputs.yoctoBranch }} --single-branch $YOCTO_SOURCE yocto
 
-      - name: Setup Yocto Environment
+          cd yocto/
+          git clone -b ${{ inputs.yoctoBranch }} $RPI_SOURCE
+          git clone -b ${{ inputs.yoctoBranch }} $OE_SOURCE
+
+      - name: Build Yocto
         run: |
           cd yocto/
-          git clone -b dunfell $RPI_SOURCE
-          git clone -b dunfell $OE_SOURCE
 
           source oe-init-build-env
 
@@ -59,5 +63,5 @@ jobs:
       - name: Archive Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: yocto-rpi-image
+          name: yocto-rpi-image-${{ steps.date_time.outputs.run_date }}
           path: yocto/build/tmp/deploy/images/raspberrypi4-64/*.bz2
