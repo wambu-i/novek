@@ -35,7 +35,7 @@ jobs:
 
       - name: Build Raspberry Pi Image
         run: |
-          cd yocto/build/
+          cd build/
           bitbake rpi-basic-image
 
       - name: Archive Artifact
