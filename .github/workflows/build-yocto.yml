@@ -35,6 +35,7 @@ jobs:
 
       - name: Build Raspberry Pi Image
         run: |
+          ls .
           cd build/
           bitbake rpi-basic-image
 
