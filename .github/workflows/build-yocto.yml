@@ -25,12 +25,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gawk wget git-core diffstat unzip texinfo gcc-multilib build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping libsdl1.2-dev xterm
+          sudo locale-gen en_US.UTF-8
 
       - name: Clone Yocto Repository
         run: git clone -b ${{ inputs.yoctoBranch }} --single-branch git://git.yoctoproject.org/poky yocto
 
       - name: Setup Yocto Environment
-        run: source yocto/poky/oe-init-build-env
+        run: source source yocto/oe-init-build-env
 
       - name: Build Raspberry Pi Image
         run: bitbake rpi-basic-image
