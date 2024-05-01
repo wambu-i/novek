@@ -31,7 +31,7 @@ jobs:
         run: git clone -b ${{ inputs.yoctoBranch }} --single-branch git://git.yoctoproject.org/poky yocto
 
       - name: Setup Yocto Environment
-        run: source source yocto/oe-init-build-env
+        run: source yocto/oe-init-build-env
 
       - name: Build Raspberry Pi Image
         run: bitbake rpi-basic-image
