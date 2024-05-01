@@ -8,6 +8,11 @@ on:
         default: 'dunfell'
         required: true
         type: string
+      runName:
+        description: 'Unique Name for Release Image'
+        default: ''
+        required: true
+        type: string
 
 env:
   YOCTO_SOURCE: ''
@@ -46,11 +51,11 @@ jobs:
           bitbake-layers add-layer ../meta-openembedded/meta-networking
           bitbake-layers add-layer ../meta-raspberrypi
 
-          sed -i 's/MACHINE ??= "qemux86-64"/MACHINE ?= "raspberrypi4-64"/' conf/local.conf
-
       - name: Build Raspberry Pi Image
         run: |
           source yocto/oe-init-build-env
+          sed -i 's/MACHINE ??= "qemux86-64"/MACHINE ?= "raspberrypi4-64"/' conf/local.conf
+
           bitbake core-image-base --runonly=fetch
           bitbake core-image-base
 
@@ -58,4 +63,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: yocto-rpi-image
-          path: yocto/build/tmp/deploy/images/raspberrypi
+          path: yocto/build/tmp/deploy/images/raspberrypi4-64/*.bz2
