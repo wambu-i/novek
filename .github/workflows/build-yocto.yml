@@ -11,6 +11,8 @@ on:
 
 env:
   YOCTO_SOURCE: ''
+  RPI_SOURCE: 'git://git.yoctoproject.org/meta-raspberrypi.git'
+  OE_SOURCE: 'git://git.openembedded.org/meta-openembedded'
 
 jobs:
   build:
@@ -31,7 +33,20 @@ jobs:
         run: git clone -b ${{ inputs.yoctoBranch }} --single-branch git://git.yoctoproject.org/poky yocto
 
       - name: Setup Yocto Environment
-        run: source yocto/oe-init-build-env
+        run: |
+          cd yocto/
+          git clone -b dunfell $RPI_SOURCE
+          git clone -b dunfell $OE_SOURCE
+
+          source oe-init-build-env
+
+          bitbake-layers add-layer ../meta-openembedded/meta-oe
+          bitbake-layers add-layer ../meta-openembedded/meta-python
+          bitbake-layers add-layer ../meta-openembedded/meta-multimedia
+          bitbake-layers add-layer ../meta-openembedded/meta-networking
+          bitbake-layers add-layer ../meta-raspberrypi
+
+          sed -i 's/MACHINE ??= "qemux86-64"/MACHINE ?= "raspberrypi4-64"/' conf/local.conf
 
       - name: Build Raspberry Pi Image
         run: |
