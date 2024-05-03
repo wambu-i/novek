@@ -5,7 +5,7 @@ on:
     inputs:
       # The name of the branch of the Yocto source repository which corresponds to a Yocto release: https://wiki.yoctoproject.org/wiki/Releases
       # The raspberry-pi source should also have a release with the same name.
-      yoctoBranch: 
+      yoctoBranch:
         description: 'Yocto Branch To Use For Build'
         default: 'dunfell'
         required: true
@@ -19,15 +19,29 @@ env:
 jobs:
   build:
     name: Build RPi Yocto Image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Set Date Time
         id: date_time
         run: echo "::set-output name=run_date::$(date +'%Y%m%d')"
 
+      - name: Maximize build disk space
+        uses: easimon/maximize-build-space@v10
+        with:
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+
       - name: Checkout Repository
         uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          echo "Free space:"
+          df -h
 
       - name: Install Required Packages
         run: |
